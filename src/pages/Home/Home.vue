@@ -17,7 +17,7 @@ import Rank from "@/pages/Home/Rank";
 import Like from "@/pages/Home/Like";
 import Floor from "@/pages/Home/Floor";
 import Brand from "@/pages/Home/Brand";
-import {mapState} from "vuex";
+import {mapActions, mapState} from "vuex";
 
 export default {
     name: "Home",
@@ -25,8 +25,18 @@ export default {
     computed: {
         ...mapState("home", ["floorList"])
     },
-    mounted() {
+    methods: {
+        ...mapActions("user", ["toUserInfo", "toLogout"])
+    },
+    async mounted() {
         this.$store.dispatch("home/floorList");
+        if (localStorage.getItem("TOKEN")) {
+            try {
+                await this.toUserInfo();
+            } catch (e) {
+                this.toLogout();
+            }
+        }
     }
 }
 </script>

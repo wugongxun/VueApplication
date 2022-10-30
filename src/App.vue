@@ -9,13 +9,17 @@
 <script>
     import Header from "@/components/Header/Header";
     import Footer from "@/components/Footer/Footer";
+    import {mapActions} from "vuex";
 
     export default {
         name: 'App',
         components: {Header, Footer},
+        methods: {
+            ...mapActions("home", ["categoryList", "bannerList"])
+        },
         mounted() {
-            this.$store.dispatch("home/categoryList");
-            this.$store.dispatch("home/bannerList");
+            this.categoryList();
+            this.bannerList();
         }
     }
 </script>

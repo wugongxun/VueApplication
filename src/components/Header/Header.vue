@@ -4,9 +4,13 @@
             <div class="container">
                 <div class="login">
                     <p>尚品汇欢迎您!</p>
-                    <p>
+                    <p v-if="!userInfo.name">
                         请<router-link to="/login">登录</router-link>
                         <router-link to="/register" class="register">免费注册</router-link>
+                    </p>
+                    <p v-else>
+                        <a>{{userInfo.nickName}}</a>
+                        <a class="register" @click="logout">退出登录</a>
                     </p>
                 </div>
                 <div class="type-list">
@@ -36,6 +40,8 @@
 </template>
 
 <script>
+import {mapState} from "vuex";
+
 export default {
     name: "Header",
     data() {
@@ -50,7 +56,18 @@ export default {
                 location.query = this.$route.query;
             }
             this.$router.push(location);
+        },
+        async logout() {
+            try {
+                await this.$store.dispatch("user/toLogout");
+                this.$router.push({name: "home"});
+            } catch (e) {
+                alert(e.message);
+            }
         }
+    },
+    computed: {
+        ...mapState("user", ["userInfo"])
     },
     mounted() {
         this.$bus.$on("removeKeyword", () => {
@@ -75,7 +92,6 @@ export default {
     }
     .login {
         float: left;
-        width: 200px;
         height: 30px;
         line-height: 30px;
         color: #333;
@@ -85,6 +101,7 @@ export default {
     }
     .login p:first-child {
         float: left;
+        margin-right: 5px;
     }
     .login p:last-child {
         float: right;

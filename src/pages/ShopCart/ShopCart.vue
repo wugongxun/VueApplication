@@ -165,6 +165,14 @@ export default {
     },
     async mounted() {
         await this.getCartList();
+    },
+    beforeRouteEnter(to, from, next) {
+        //未登录，也没有游客登录信息，跳转到登录页面
+        if (sessionStorage.getItem("UUIDTOKEN") || localStorage.getItem("TOKEN")) {
+            next();
+        } else {
+            next("/login");
+        }
     }
 }
 </script>

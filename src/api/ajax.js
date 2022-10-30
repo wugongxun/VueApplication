@@ -13,9 +13,13 @@ const requests = axios.create({
 requests.interceptors.request.use(config => {
     //进度条的开始
     nprogress.start();
-    let uuid_token = localStorage.getItem("UUIDTOKEN");
+    let uuid_token = sessionStorage.getItem("UUIDTOKEN");
     if (uuid_token) {
         config.headers.userTempId = uuid_token;
+    }
+    let token = localStorage.getItem("TOKEN");
+    if (token) {
+        config.headers.token = token;
     }
     return config;
 });

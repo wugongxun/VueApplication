@@ -139,7 +139,7 @@ export default {
 .lift-item i {
     display: block;
     height: 40px;
-    background: url("@/assets/Home/icons.png") no-repeat;
+    background: url(~@/assets/Home/icons.png) no-repeat;
 }
 
 .ads img {
