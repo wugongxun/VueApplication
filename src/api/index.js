@@ -58,3 +58,9 @@ export const reqUserInfo = () => ajax({url: "/user/passport/auth/getUserInfo", m
 
 //退出登录
 export const reqLogout = () => ajax({url: "/user/passport/logout", method: "get"});
+
+//获取用户地址信息
+export const reqUserAddress = () => ajax({url: "/user/userAddress/auth/findUserAddressList", method: "get"});
+
+//获取商品清单
+export const reqOrderInfo = () => ajax({url: "/order/auth/trade", method: "get"});

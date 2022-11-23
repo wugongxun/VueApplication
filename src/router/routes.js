@@ -5,6 +5,7 @@ import Search from "@/pages/Search/Search";
 import Detail from "@/pages/Detail/Detail";
 import AddCartSuccess from "@/pages/AddCartSuccess/AddCartSuccess";
 import ShopCart from "@/pages/ShopCart/ShopCart";
+import Trade from "@/pages/Trade/Trade";
 
 export default [
     {
@@ -59,6 +60,14 @@ export default [
         path: "/shopcart",
         name: "shopcart",
         component: ShopCart,
+        meta: {
+            showFooter: true
+        }
+    },
+    {
+        path: "/trade",
+        name: "trade",
+        component: Trade,
         meta: {
             showFooter: true
         }
