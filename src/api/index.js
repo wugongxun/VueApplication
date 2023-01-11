@@ -64,3 +64,19 @@ export const reqUserAddress = () => ajax({url: "/user/userAddress/auth/findUserA
 
 //获取商品清单
 export const reqOrderInfo = () => ajax({url: "/order/auth/trade", method: "get"});
+
+//提交订单
+export const reqSubmitOrder = (tradeNo, data) => ajax({
+    url: `/order/auth/submitOrder?tradeNo=${tradeNo}`,
+    data,
+    method: "post"
+});
+
+//获取支付订单信息
+export const reqPaymentInfo = (orderId) => ajax({url: `/payment/weixin/createNative/${orderId}`, method: "get"});
+
+//获取支付订单状态
+export const reqPaymentStatus = (orderId) => ajax({url: `/payment/weixin/queryPayStatus/${orderId}`, method: "get"});
+
+//获取我的订单列表
+export const reqMyOrderList = (page, limit) => ajax({url: `/order/auth/${page}/${limit}`, method: "get"});

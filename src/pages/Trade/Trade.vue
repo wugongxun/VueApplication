@@ -5,8 +5,8 @@
         <div class="content">
             <h5 class="receive">收件人信息</h5>
             <div class="address clearfix" v-for="address in userAddress" :key="address.id">
-                <span class="username selected">{{address.consignee}}</span>
-                <p>
+                <span class="username" :class="{selected: address.isDefault == '1'}">{{address.consignee}}</span>
+                <p @click="changeDefault(address.id)">
                     <span class="s1">{{address.fullAddress}}</span>
                     <span class="s2">{{address.phoneNum}}</span>
                     <span class="s3" v-show="address.isDefault == '1'">默认地址</span>
@@ -17,7 +17,6 @@
             <div class="address clearfix">
                 <span class="username selected">在线支付</span>
                 <span class="username" style="margin-left:5px;">货到付款</span>
-
             </div>
             <div class="line"></div>
             <h5 class="pay">送货清单</h5>
@@ -30,41 +29,24 @@
             </div>
             <div class="detail">
                 <h5>商品清单</h5>
-                <ul class="list clearfix">
+                <ul class="list clearfix" v-for="(order, index) in orderInfo.detailArrayList" :key="order.skuId">
                     <li>
-                        <img src="@/assets/Trade/goods.png" alt="">
+                        <img :src="order.imgUrl" alt="">
                     </li>
                     <li>
-                        <p>
-                            Apple iPhone 6s (A1700) 64G 玫瑰金色 移动联通电信4G手机硅胶透明防摔软壳 本色系列</p>
+                        <p>{{order.skuName}}</p>
                         <h4>7天无理由退货</h4>
                     </li>
                     <li>
-                        <h3>￥5399.00</h3>
+                        <h3>￥{{order.orderPrice}}</h3>
                     </li>
-                    <li>X1</li>
-                    <li>有货</li>
-                </ul>
-                <ul class="list clearfix">
-                    <li>
-                        <img src="@/assets/Trade/goods.png" alt="">
-                    </li>
-                    <li>
-                        <p>
-                            Apple iPhone 6s (A1700) 64G 玫瑰金色 移动联通电信4G手机硅胶透明防摔软壳 本色系列</p>
-                        <h4>7天无理由退货</h4>
-                    </li>
-                    <li>
-                        <h3>￥5399.00</h3>
-                    </li>
-                    <li>X1</li>
+                    <li>X{{order.skuNum}}</li>
                     <li>有货</li>
                 </ul>
             </div>
             <div class="bbs">
                 <h5>买家留言：</h5>
-                <textarea placeholder="建议留言前先与商家沟通确认" class="remarks-cont"></textarea>
-
+                <textarea placeholder="建议留言前先与商家沟通确认" class="remarks-cont" v-model="msg"></textarea>
             </div>
             <div class="line"></div>
             <div class="bill">
@@ -76,12 +58,12 @@
         <div class="money clearfix">
             <ul>
                 <li>
-                    <b><i>1</i>件商品，总商品金额</b>
-                    <span>¥5399.00</span>
+                    <b><i>{{orderInfo.totalNum}}</i>件商品，总商品金额</b>
+                    <span>¥{{orderInfo.originalTotalAmount}}</span>
                 </li>
                 <li>
                     <b>返现：</b>
-                    <span>0.00</span>
+                    <span>{{orderInfo.activityReduceAmount}}</span>
                 </li>
                 <li>
                     <b>运费：</b>
@@ -90,17 +72,16 @@
             </ul>
         </div>
         <div class="trade">
-            <div class="price">应付金额:　<span>¥5399.00</span></div>
+            <div class="price">应付金额:<span>¥{{orderInfo.totalAmount}}</span></div>
             <div class="receiveInfo">
                 寄送至:
-                <span>北京市昌平区宏福科技园综合楼6层</span>
-                收货人：<span>张三</span>
-                <span>15010658793</span>
+                <span>{{userDefaultAddress.fullAddress}}</span>
+                收货人：<span>{{userDefaultAddress.consignee}}</span>
+                <span>{{userDefaultAddress.phoneNum}}</span>
             </div>
         </div>
         <div class="sub clearfix">
-            <a href="##" class="subBtn">提交订单</a>
-
+            <a class="subBtn" @click="submitOrder()">提交订单</a>
         </div>
     </div>
 </template>
@@ -110,15 +91,45 @@ import {mapActions, mapState} from "vuex";
 
 export default {
     name: "Trade",
+    data() {
+        return {
+            msg: ""
+        }
+    },
     computed: {
-        ...mapState("trade", ["userAddress"])
+        ...mapState("trade", ["userAddress", "orderInfo"]),
+        userDefaultAddress() {
+            return this.userAddress.find(item => item.isDefault == '1') || {};
+        }
     },
     methods: {
-        ...mapActions("trade", ["toUserAddress", "toOrderInfo"])
+        ...mapActions("trade", ["toUserAddress", "toOrderInfo", "toSubmitOrder"]),
+        changeDefault(id) {
+            this.userAddress.forEach(item => {
+                if (item.id == id)
+                    item.isDefault = '1';
+                else
+                    item.isDefault = '0';
+            });
+        },
+        async submitOrder() {
+            let {consignee, phoneNum, fullAddress} = this.userDefaultAddress;
+            let {tradeNo, detailArrayList} = this.orderInfo;
+            let data = {consignee, consigneeTel: phoneNum, deliveryAddress: fullAddress, paymentWay: "ONLINE", orderComment: this.msg, orderDetailList: detailArrayList}
+            let res = await this.toSubmitOrder({tradeNo, data});
+            this.$router.push({name: 'pay', query: res});
+        }
     },
     mounted() {
         this.toUserAddress();
         this.toOrderInfo();
+    },
+    beforeRouteEnter(to, form, next) {
+        if (form.path === "/shopcart") {
+            next();
+        } else {
+            next(false);
+        }
     }
 }
 </script>
@@ -265,8 +276,16 @@ export default {
             li {
                 line-height: 30px;
 
-                p {
+                &:nth-child(2) {
+                    width: 600px;
+                }
 
+                img {
+                    width: 82px;
+                    height: 82px;
+                }
+
+                p {
                     margin-bottom: 20px;
                 }
 

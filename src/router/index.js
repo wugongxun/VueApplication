@@ -46,12 +46,20 @@ router.beforeEach(async (to, from, next) => {
                     await store.dispatch("user/toLogout");
                 }
             }
+            next();
         } else {
             //有登录TOKEN，不让再次进login页面，跳转到首页
             next("/home");
         }
+    } else {
+        let path = to.path;
+        //未登录去交易页，支付页，订单页，跳转到登录页
+        if (path.indexOf("trade") != -1 || path.indexOf("pay") != -1 || path.indexOf("center") != -1) {
+            next("/login?redirect=" + path);
+        } else {
+            next();
+        }
     }
-    next();
 });
 
 export default router;

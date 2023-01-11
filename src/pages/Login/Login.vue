@@ -17,14 +17,28 @@
                         <form>
                             <div class="input-text clearfix">
                                 <i></i>
-                                <input type="text" name="phone" autocomplete="on" placeholder="手机号" v-model="phone">
-                                <span class="error-msg">错误提示信息</span>
+                                <input type="text"
+                                       name="phone"
+                                       autocomplete="on"
+                                       placeholder="手机号"
+                                       v-model="phone"
+                                       v-validate="{required: true, regex: /^1\d{10}$/}"
+                                       :class="{invalid: errors.has('phone')}"
+                                >
+                                <span class="error-msg">{{errors.first('phone')}}</span>
                             </div>
 
                             <div class="input-text clearfix">
                                 <i class="pwd"></i>
-                                <input type="text" placeholder="请输入密码" v-model="password">
-                                <span class="error-msg">错误提示信息</span>
+                                <input type="text"
+                                       name="password"
+                                       autocomplete="on"
+                                       placeholder="请输入密码"
+                                       v-model="password"
+                                       v-validate="{required: true, regex: /^[0-9a-zA-Z]{8,20}$/}"
+                                       :class="{invalid: errors.has('password')}"
+                                >
+                                <span class="error-msg">{{errors.first('password')}}</span>
                             </div>
 
                             <div class="setting clearfix">
@@ -84,10 +98,15 @@ export default {
         ...mapActions("user", ["toLogin"]),
         async login() {
             const {phone, password} = this;
-            if (phone && password) {
+            if (await this.$validator.validateAll()) {
                 try {
                     await this.toLogin({phone, password});
-                    this.$router.push({name: "home"});
+                    let redirect = this.$route.query.redirect;
+                    if (redirect) {
+                        this.$router.push(redirect);
+                    } else {
+                        this.$router.push({name: "home"});
+                    }
                 } catch (e) {
                     alert(e.message);
                 }

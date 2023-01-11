@@ -1,4 +1,4 @@
-import {reqOrderInfo, reqUserAddress} from "@/api";
+import {reqOrderInfo, reqSubmitOrder, reqUserAddress} from "@/api";
 
 const actions = {
     async toUserAddress({commit}) {
@@ -13,6 +13,14 @@ const actions = {
         let res = await reqOrderInfo();
         if (res.code == 200) {
             commit("TOORDERINFO", res.data);
+        } else {
+            return Promise.reject(new Error(res.message));
+        }
+    },
+    async toSubmitOrder({commit}, {tradeNo, data}) {
+        let res = await reqSubmitOrder(tradeNo, data);
+        if (res.code == 200) {
+            return res.data;
         } else {
             return Promise.reject(new Error(res.message));
         }
