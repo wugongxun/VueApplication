@@ -2,6 +2,7 @@ const { defineConfig } = require('@vue/cli-service')
 module.exports = defineConfig({
   transpileDependencies: true,
   lintOnSave: false,
+  productionSourceMap: false,
   //解决跨域问题
   devServer: {
     proxy: {

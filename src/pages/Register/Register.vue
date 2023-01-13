@@ -33,7 +33,7 @@
                        type="password"
                        v-model="password"
                        name="password"
-                       v-validate="{required: true, regex: /^[0-9a-zA-Z]{8,20}$/}"
+                       v-validate="{required: true, regex: /^[0-9a-zA-Z]{6,20}$/}"
                        :class="{invalid: errors.has('password')}"
                 />
                 <span class="error-msg">{{ errors.first("password") }}</span>
